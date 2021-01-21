@@ -1,6 +1,7 @@
 import java.util.Iterator;
 
-public class WinstonLeeLinkedList<E> implements Iterable<Node<E>>
+@SuppressWarnings("UnusedReturnValue")
+public class WinstonLeeLinkedList<E> implements Iterable<E>
 {
     private Node<E> head;
 
@@ -24,19 +25,25 @@ public class WinstonLeeLinkedList<E> implements Iterable<Node<E>>
 
     public void add(int index, E e)
     {
-        Node<E> cursor = head;
-        int cursorIndex = 0;
-
-        //Transverse to node at position (index-1)
-        while (cursorIndex != index - 1)
+        if (index > 0 && index < size())
         {
-            cursor = cursor.next;
-            cursorIndex += 1;
-        }
+            Node<E> cursor = head;
+            int count = 0;
 
-        Node<E> insert = new Node<>(e);
-        insert.next = cursor.next;
-        cursor.next = insert;
+            //Transverse to node at position (index-1)
+            while (count < index - 1) {
+                cursor = cursor.next;
+                count += 1;
+            }
+
+            Node<E> insert = new Node<>(e);
+            insert.next = cursor.next;
+            cursor.next = insert;
+        }
+        else if (index == 0)
+            add(e);
+        else
+            throw new IndexOutOfBoundsException();
     }
 
     public void addFirst(E e)
@@ -51,9 +58,10 @@ public class WinstonLeeLinkedList<E> implements Iterable<Node<E>>
         Node<E> cursor = head;
 
         //Transverse to tail
-        while (cursor.next != null)
+        while (cursor != null && cursor.next != null)
             cursor = cursor.next;
 
+        assert cursor != null;
         cursor.next = new Node<>(e);
     }
 
@@ -67,7 +75,7 @@ public class WinstonLeeLinkedList<E> implements Iterable<Node<E>>
         Node<E> cursor = head;
 
         //Transverse to tail
-        while (cursor.next != null)
+        while (cursor != null && cursor.next != null)
         {
             if (o.equals(cursor.obj))
                 return true;
@@ -85,7 +93,7 @@ public class WinstonLeeLinkedList<E> implements Iterable<Node<E>>
             Node<E> cursor = head;
 
             //Transverse to specified index
-            while (count != index)
+            while (count < index)
             {
                 cursor = cursor.next;
                 count++;
@@ -107,9 +115,10 @@ public class WinstonLeeLinkedList<E> implements Iterable<Node<E>>
         Node<E> cursor = head;
 
         //Transverse to tail
-        while (cursor.next != null)
+        while (cursor != null && cursor.next != null)
             cursor = cursor.next;
 
+        assert cursor != null;
         return cursor.obj;
     }
 
@@ -140,13 +149,13 @@ public class WinstonLeeLinkedList<E> implements Iterable<Node<E>>
 
     public E remove(int index)
     {
-        if (index >= 0 && index < size())
+        if (index > 0 && index < size())
         {
             int count = 0;
             Node<E> cursor = head;
 
             //Transverse to specified index - 1
-            while (count != index - 1)
+            while (count < index - 1)
             {
                 cursor = cursor.next;
                 count++;
@@ -157,6 +166,8 @@ public class WinstonLeeLinkedList<E> implements Iterable<Node<E>>
 
             return obj;
         }
+        else if (index == 0)
+            return remove();
         else
             throw new IndexOutOfBoundsException();
     }
@@ -170,23 +181,33 @@ public class WinstonLeeLinkedList<E> implements Iterable<Node<E>>
 
     public E set(int index, E e)
     {
-        if (index >= 0 && index < size())
+        if (index > 0 && index < size())
         {
             int count = 0;
             Node<E> cursor = head;
 
             //Transverse to specified index - 1
-            while (count != index - 1)
+            while (count < index - 1)
             {
                 cursor = cursor.next;
                 count++;
             }
 
-            E obj = cursor.obj;
+            E obj = cursor.next.obj;
 
             Node<E> insert = new Node<>(e);
             insert.next = cursor.next.next;
             cursor.next = insert;
+
+            return obj;
+        }
+        else if (index == 0)
+        {
+            E obj = head.obj;
+
+            Node<E> insert = new Node<>(e);
+            insert.next = head.next;
+            head = insert;
 
             return obj;
         }
@@ -196,7 +217,10 @@ public class WinstonLeeLinkedList<E> implements Iterable<Node<E>>
 
     public int size()
     {
-        int count = 0;
+        if (head == null)
+            return 0;
+
+        int count = 1;
         Node<E> cursor = head;
 
         //Transverse to tail
@@ -210,11 +234,11 @@ public class WinstonLeeLinkedList<E> implements Iterable<Node<E>>
     }
 
     @Override
-    public Iterator<Node<E>> iterator() {
+    public Iterator<E> iterator() {
         return new NodeIterator();
     }
 
-    protected class NodeIterator implements Iterator<Node<E>>
+    protected class NodeIterator implements Iterator<E>
     {
         private Node<E> cursor;
 
@@ -225,14 +249,14 @@ public class WinstonLeeLinkedList<E> implements Iterable<Node<E>>
 
         @Override
         public boolean hasNext() {
-            return cursor.next != null;
+            return cursor != null;
         }
 
         @Override
-        public Node<E> next() {
+        public E next() {
             Node<E> current = cursor;
             cursor = cursor.next;
-            return current;
+            return current.obj;
         }
     }
 }
