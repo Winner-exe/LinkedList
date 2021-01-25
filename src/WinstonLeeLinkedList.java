@@ -259,4 +259,15 @@ public class WinstonLeeLinkedList<E> implements Iterable<E>
             return current.obj;
         }
     }
+
+    protected class Node<T extends E>
+    {
+        public final E obj;
+        public Node<T> next;
+
+        public Node(E obj)
+        {
+            this.obj = obj;
+        }
+    }
 }
